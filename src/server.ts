@@ -51,8 +51,26 @@ app.use(express.json())
 app.get('/', (req:Request, res:Response) => {
   res.send('Hello World Next Level web Developers')
 })
-app.post("/",(req:Request,res:Response) => {
-    console.log("Request: ",req.body );
+app.post("/users",async(req:Request,res:Response) => {
+  const {name,email,age,phone,address} = req.body 
+      try {
+    const result = await pool.query(
+      `INSERT INTO users(name, email,age,phone,address) VALUES($1, $2,$3,$4,$5) RETURNING *`,
+      [name, email,age,phone,address]
+    );
+    console.log(result.rows[0]);
+  res.status(201).json({
+      success:false,
+      message: "dat inserted successfully",
+      data:result.rows[0]
+    })
+    
+  } catch (err:any) {
+    res.status(500).json({
+      success:false,
+      message:err.message
+    })
+  }
     res.status(201).json({
         seccess:true,
         message:"Api is Working"
